@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mysql-pv
+spec:
+  containers:
+  - name: mysql
+    image: mysql:latest
+    ports:
+      - containerPort: 3306 
+    volumeMounts:
+      - name: mysql-data
+        mountPath: /var/lib/mysql
+    env:
+      - name: MYSQL_DATABASE
+        value: eazytraining
+      - name: MYSQ_USER
+        value: eazy
+      - name: MYSQL_PASSWORD
+        value: eazy
+      - name: MYSQL_ROOT_PASSWORD
+        value: password
+  volumes:
+  -  name : mysql-data
+     persistentVolumeClaim: 
+       claimName: pvc   
+    
+        
+        
