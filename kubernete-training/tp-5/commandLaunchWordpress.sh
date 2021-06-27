@@ -1,0 +1,1 @@
+helm install stable/wordpress --name mywordpress -f values.yaml
