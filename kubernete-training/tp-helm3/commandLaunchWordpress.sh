@@ -1,0 +1,1 @@
+helm install mywordpress bitnami/wordpress -f values.yaml
