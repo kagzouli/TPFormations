@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: static-files
+data:
+  index2.html: |
+    <html><head><title>End of the Internet</title></head>
+    <body><h1>Capital / City</h1>
+    <p>The capital of {{ .Values.application.index2.country }} is {{ .Values.application.index2.city }} </p>
+    </body></html>
+
+  index3.html: |
+    <html><head><title>End of the Internet</title></head>
+    <body><h1>Country/ Continent</h1>
+    <p>The country {{ .Values.application.index3.country }} is in {{ .Values.application.index3.continent }}</p>
+    </body></html>
+
