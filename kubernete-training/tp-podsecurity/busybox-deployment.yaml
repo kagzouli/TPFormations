@@ -23,6 +23,9 @@ spec:
           - /bin/sh
           - -c
           - touch /tmp/healthy; sleep 60; rm -f /tmp/healthy; sleep 600
+        securityContext:
+          runAsUser: 5000
+          runAsGroup: 6000
       securityContext:
         runAsUser: 1000
         runAsGroup: 3000
