@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox-deployment
+  namespace: testqa
+  labels: 
+    app: busybox 
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app:  busybox
+  
+  template:
+    metadata:
+      labels:
+        app: busybox
+    spec:
+      containers:
+      - name: busybox-con
+        image: busybox
+        args: 
+          - /bin/sh
+          - -c
+          - touch /tmp/healthy; sleep 60; rm -f /tmp/healthy; sleep 600
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 3000
+        fsGroup: 2000
+    
