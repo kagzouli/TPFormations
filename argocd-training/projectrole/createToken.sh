@@ -1,0 +1,1 @@
+C:\\Users\\kagzo\\OneDrive\\Bureau\\argoCD\\argocd.exe proj role create-token project-with-role ci-role
