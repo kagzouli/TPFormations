@@ -1,0 +1,1 @@
+argo -n argo submit wf-input-parameters.yaml

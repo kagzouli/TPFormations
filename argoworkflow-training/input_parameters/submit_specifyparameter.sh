@@ -1,0 +1,1 @@
+ argo -n argo submit wf-input-parameters.yaml -p message1="Parameter used from Terminal"
