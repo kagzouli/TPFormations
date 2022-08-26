@@ -96,6 +96,18 @@ spec:
           - name: word-detect
             value: "{{inputs.parameters.word-detect}}"
 
+      - name: email-detected
+        depends: detect.Succeeded
+        when: "{{tasks.detect.outputs.result}} == Detected"
+        template: email-detected-template
+        arguments:
+          parameters:
+          - name: text
+            value: "{{inputs.parameters.text}}"
+          - name: sender
+            value: "{{inputs.parameters.sender}}"
+
+
   - name:  detect-template
     inputs:
       parameters:
@@ -108,6 +120,21 @@ spec:
       source: |
         if "{{inputs.parameters.word-detect}}" in "{{inputs.parameters.text}}" : print("Detected") 
         else: print("OK")
+
+  - name: email-detected-template
+    inputs:
+      parameters:
+      - name: text
+      - name: sender
+    script:
+      image: python:3.8-slim
+      command: [python]
+      source: |
+        notification_email = "toto"
+        print("Send notification email to ", notification_email, " with the content: ")
+        print("Sender: ", "{{inputs.parameters.sender}}}")
+        print("Text: ", "{{inputs.parameters.text}}}")
+
 
 
 
