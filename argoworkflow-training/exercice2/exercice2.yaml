@@ -1,0 +1,102 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  name: wf-exercice2
+spec: 
+  entrypoint: dag-template
+  templates:
+  - name:  dag-template
+    dag:
+      tasks:
+      - name: get-source
+        template: get-source-template
+
+      - name: read-emails
+        depends: get-source.Succeeded
+        arguments:
+          artifacts: [{name: text, from: "{{tasks.get-source.outputs.artifacts.emails}}"}]
+        template: read-email-templates
+
+      - name: loop
+        depends: read-emails.Succeeded
+        template: loop-template
+        arguments: 
+          parameters:
+          - name: "text"
+            value: "{{ item.text}}"
+          
+          - name: "sender"
+            value: "{{ item.sender}}"
+        withParam: "{{tasks.read-emails.outputs.result}}"
+
+
+  - name:  get-source-template
+    script: 
+      image: ubuntu:20.04
+      command: [sh]
+      source: |
+         apt-get update
+         apt-get install -y curl
+         mkdir source-file;
+         cd source-file;
+         curl $SOURCE_URL -o emails.csv
+         ls
+      env:
+      - name: SOURCE_URL
+        valueFrom:
+          secretKeyRef:
+            name: exercice2-secret
+            key: source_url
+    outputs:
+      artifacts:
+      - name: emails
+        path: /source-file/emails.csv
+
+  - name:  read-email-templates
+    inputs:
+      artifacts:
+      - name: text
+        path: /tmp/text
+    script:
+      image: python:3.8-slim
+      command: [python]
+      source: |
+        import json
+        import sys
+        with open("/tmp/text", "r") as f:
+           lines = f.readlines()
+           lines = [x.strip().split(";") for x in lines]
+           json.dump([{lines[0][0]: i[0].strip('"'), lines[0][1]: i[1]} for i in lines[1:]], sys.stdout)
+
+
+  - name:  loop-template
+    inputs:
+      parameters:
+      - name: text
+      - name: sender
+    dag:
+      tasks:
+      - name: detect
+        template: detect-template
+        arguments:
+          parameters:
+          - name: text
+            value: "{{inputs.parameters.text}}"
+          - name: sender
+            value: "{{inputs.parameters.sender}}"
+
+  - name:  detect-template
+    inputs:
+      parameters:
+      - name: text
+      - name: sender
+    script:
+      image: python:3.8-slim
+      command: [python]
+      source: |
+        if "bomb" in "{{inputs.parameters.text}}" : print("Detected") 
+        else: print("OK")
+
+
+
+ 
