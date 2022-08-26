@@ -4,8 +4,15 @@ metadata:
   name: wf-exercice2
 spec: 
   entrypoint: dag-template
+  arguments:
+    parameters:
+    - name: word-detect
+      value: bomb
   templates:
   - name:  dag-template
+    inputs: 
+      parameters:
+      - name: word-detect
     dag:
       tasks:
       - name: get-source
@@ -23,10 +30,11 @@ spec:
         arguments: 
           parameters:
           - name: "text"
-            value: "{{ item.text}}"
-          
+            value: "{{item.text}}"
           - name: "sender"
-            value: "{{ item.sender}}"
+            value: "{{item.sender}}"
+          - name: "word-detect"
+            value: "{{inputs.parameters.word-detect}}"
         withParam: "{{tasks.read-emails.outputs.result}}"
 
 
@@ -74,6 +82,7 @@ spec:
       parameters:
       - name: text
       - name: sender
+      - name: word-detect
     dag:
       tasks:
       - name: detect
@@ -84,17 +93,20 @@ spec:
             value: "{{inputs.parameters.text}}"
           - name: sender
             value: "{{inputs.parameters.sender}}"
+          - name: word-detect
+            value: "{{inputs.parameters.word-detect}}"
 
   - name:  detect-template
     inputs:
       parameters:
       - name: text
       - name: sender
+      - name: word-detect
     script:
       image: python:3.8-slim
       command: [python]
       source: |
-        if "bomb" in "{{inputs.parameters.text}}" : print("Detected") 
+        if "{{inputs.parameters.word-detect}}" in "{{inputs.parameters.text}}" : print("Detected") 
         else: print("OK")
 
 
